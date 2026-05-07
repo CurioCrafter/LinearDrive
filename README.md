@@ -24,6 +24,22 @@ build/bin/LinearDrive.exe
 
 The post-build step copies `assets/` beside the executable.
 
+## Download And Install
+
+For friends who just want to play, use the GitHub Release installer:
+
+1. Download `LinearDriveSetup.exe`.
+2. Run it.
+3. It installs the game to `%LOCALAPPDATA%\LinearDrive`, creates Desktop and Start Menu shortcuts, and launches the game.
+
+The release also includes `LinearDrive-Windows.zip` for manual extraction.
+
+To rebuild the installer locally after packaging:
+
+```powershell
+.\tools\build_installer.ps1
+```
+
 ## Controls
 
 Primary interaction is diegetic: hover and click the modeled cockpit parts inside the car. The radio, ignition, shifter, lock, handle, mirror, headlights, horn, wipers, fan, dome light, glovebox, and window crank all have physical hit areas. Keyboard controls remain as backups:
