@@ -69,7 +69,7 @@ Core rule: when a monster is active, slowing below 12 MPH fills the SLOW RISK me
 V3 adds the cockpit and skill gameplay pass:
 
 - The first-person cabin now uses the supplied Toyota RAV4 FBX converted to `assets/models/toyota_rav4_cockpit.glb`; the gameplay radio, shifter, ignition, lock, and other diegetic controls are mounted into that cabin.
-- The Toyota cockpit is calibrated as a car-local 3D rig: +X passenger/right, +Y up, and -Z road/front. Debug capture scenes verify the exterior orientation, driver-eye camera, and projected cockpit anchors.
+- The Toyota cockpit is calibrated as a car-local 3D rig: +X passenger/right, +Y up, and -Z road/front. The Toyota asset is rotated into that direction with positive scale so the left-hand-drive cabin is not mirrored. Debug capture scenes verify the exterior orientation, driver-eye camera, and projected cockpit anchors.
 - The old right-side gameplay button bar has been replaced with modeled cockpit controls and projected hit areas.
 - Loose radio interference can pull the steering. Click the physical radio to stabilize it before the car drifts off the road.
 - Shifter slip can dump the car into neutral or block acceleration. Click the shifter to re-seat it.

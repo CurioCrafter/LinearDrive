@@ -202,6 +202,8 @@ int RunSmokeTests() {
     const CockpitRig& rig = ToyotaCockpitRig();
     const Camera3D driverCamera = CockpitCamera(cockpitState, CockpitCameraMode::Driver, rig);
     const BoundingBox toyotaBounds = ToyotaModelBoundsWorld(cockpitState, rig);
+    ok &= Require(rig.modelScale.x > 0.0f && rig.modelScale.y > 0.0f && rig.modelScale.z > 0.0f, "Toyota model transform preserves cabin handedness");
+    ok &= Require(std::abs(rig.modelYawDegrees - 180.0f) < 0.01f, "Toyota model uses yaw rotation instead of mirror scale");
     ok &= Require(PointInBox(driverCamera.position, toyotaBounds), "driver camera sits inside Toyota cockpit bounds");
     ok &= Require(driverCamera.target.z < driverCamera.position.z, "driver camera points through windshield toward road front");
 

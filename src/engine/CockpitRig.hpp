@@ -27,10 +27,10 @@ struct CockpitAnchor {
 
 struct CockpitRig {
     Vector3 modelPosition {0.0f, -0.62f, 2.86f};
-    // The Toyota asset is authored with its nose on raw +Z. Mirror the model on Z so
-    // the shared car-local rig keeps the game convention: -Z is road/front.
-    Vector3 modelScale {3.15f, 3.15f, -3.15f};
-    float modelYawDegrees = 0.0f;
+    // The Toyota asset is authored with its nose on raw +Z. Rotate it into the
+    // game convention (-Z road/front) without mirroring the left-hand-drive cabin.
+    Vector3 modelScale {3.15f, 3.15f, 3.15f};
+    float modelYawDegrees = 180.0f;
     float carYawDegrees = 0.0f;
     Vector3 modelBoundsMin {-0.461823f, 0.0f, -0.950000f};
     Vector3 modelBoundsMax {0.461823f, 0.860898f, 0.950000f};
