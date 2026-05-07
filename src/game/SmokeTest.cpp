@@ -1,6 +1,7 @@
 #include "game/SmokeTest.hpp"
 
 #include "engine/Assets.hpp"
+#include "engine/CockpitRig.hpp"
 #include "engine/Renderer.hpp"
 #include "game/Simulation.hpp"
 
@@ -196,6 +197,33 @@ int RunSmokeTests() {
     settings.State().settings.sfxVolume = 0.66f;
     ok &= Require(settings.State().settings.masterVolume == 0.42f && settings.State().settings.musicVolume == 0.33f && settings.State().settings.sfxVolume == 0.66f, "settings state exposes live audio volumes");
 
+    GameState cockpitState {};
+    cockpitState.phase = GamePhase::Playing;
+    const CockpitRig& rig = ToyotaCockpitRig();
+    const Camera3D driverCamera = CockpitCamera(cockpitState, CockpitCameraMode::Driver, rig);
+    const BoundingBox toyotaBounds = ToyotaModelBoundsWorld(cockpitState, rig);
+    ok &= Require(PointInBox(driverCamera.position, toyotaBounds), "driver camera sits inside Toyota cockpit bounds");
+    ok &= Require(driverCamera.target.z < driverCamera.position.z, "driver camera points through windshield toward road front");
+
+    Vector2 hornScreen {};
+    Vector2 radioScreen {};
+    Vector2 shifterScreen {};
+    const bool projectedHorn = ProjectWorldToScreen(CarToWorld(cockpitState, CockpitAnchorFor(Hotspot::Horn).local, rig), driverCamera, 1280, 720, hornScreen);
+    const bool projectedRadio = ProjectWorldToScreen(CarToWorld(cockpitState, CockpitAnchorFor(Hotspot::Radio).local, rig), driverCamera, 1280, 720, radioScreen);
+    const bool projectedShifter = ProjectWorldToScreen(CarToWorld(cockpitState, CockpitAnchorFor(Hotspot::GearShift).local, rig), driverCamera, 1280, 720, shifterScreen);
+    ok &= Require(projectedHorn && projectedRadio && projectedShifter, "primary Toyota cockpit anchors project from driver camera");
+    ok &= Require(hornScreen.x < radioScreen.x, "steering anchor projects left of radio anchor");
+    ok &= Require(shifterScreen.y > radioScreen.y, "shifter anchor projects below radio anchor");
+
+    bool anchorsInFrame = true;
+    for (const CockpitAnchor& anchor : CockpitAnchors()) {
+        Vector2 screen {};
+        anchorsInFrame = anchorsInFrame &&
+            ProjectWorldToScreen(CarToWorld(cockpitState, anchor.local, rig), driverCamera, 1280, 720, screen) &&
+            screen.x >= 0.0f && screen.x <= 1280.0f && screen.y >= 0.0f && screen.y <= 720.0f;
+    }
+    ok &= Require(anchorsInFrame, "all Toyota cockpit anchors project inside driver capture frame");
+
     return ok ? 0 : 1;
 }
 
@@ -218,13 +246,31 @@ int RunCapture(const char* outputPath) {
     const bool treeCrashScene = requestedName.find("treecrash") != std::string::npos;
     const bool stormScene = requestedName.find("storm") != std::string::npos;
     const bool townScene = requestedName.find("town") != std::string::npos;
-    const bool toyotaCockpitScene = requestedName.find("toyota_cockpit") != std::string::npos;
-    const bool cockpitScene = requestedName.find("cockpit_controls") != std::string::npos || toyotaCockpitScene;
+    const bool toyotaCalibrationFrontScene = requestedName.find("toyota_calibration_front") != std::string::npos;
+    const bool toyotaCalibrationLeftScene = requestedName.find("toyota_calibration_left") != std::string::npos;
+    const bool toyotaCalibrationTopScene = requestedName.find("toyota_calibration_top") != std::string::npos;
+    const bool toyotaDriverScene = requestedName.find("toyota_cockpit_driver") != std::string::npos;
+    const bool toyotaAnchorScene = requestedName.find("toyota_controls_anchor_map") != std::string::npos;
+    const bool toyotaConsoleScene = requestedName.find("toyota_console_closeup") != std::string::npos;
+    const bool toyotaCalibrationScene = toyotaCalibrationFrontScene || toyotaCalibrationLeftScene || toyotaCalibrationTopScene || toyotaAnchorScene || toyotaConsoleScene;
+    const bool toyotaCockpitScene = requestedName.find("toyota_cockpit") != std::string::npos || toyotaDriverScene;
+    const bool cockpitScene = requestedName.find("cockpit_controls") != std::string::npos || toyotaCockpitScene || toyotaAnchorScene || toyotaConsoleScene;
     const bool settingsScene = requestedName.find("settings_menu") != std::string::npos;
     const bool radioInterferenceScene = requestedName.find("radio_interference") != std::string::npos;
     const bool shifterSlipScene = requestedName.find("shifter_slip") != std::string::npos;
     const bool restartAudioScene = requestedName.find("restart_audio") != std::string::npos;
-    if (cockpitScene) {
+    if (toyotaCalibrationScene) {
+        GameState& state = simulation.State();
+        state.phase = GamePhase::Playing;
+        state.distanceMiles = 0.08f;
+        state.tension = 12.0f;
+        state.car.speedMph = 0.0f;
+        state.car.radioOn = true;
+        state.car.radioVolume = 0.5f;
+        state.car.doorLock = DoorLockState::Locked;
+        state.story.warning.clear();
+        state.story.messageTimer = 0.0f;
+    } else if (cockpitScene) {
         GameState& state = simulation.State();
         state.distanceMiles = 1.08f;
         state.tension = 66.0f;
@@ -352,7 +398,24 @@ int RunCapture(const char* outputPath) {
 
     for (int frame = 0; frame < 180; ++frame) {
         simulation.Update(input, 1.0f / 60.0f);
-        if (creatureScene) {
+        if (toyotaCalibrationScene) {
+            GameState& state = simulation.State();
+            state.phase = GamePhase::Playing;
+            state.distanceMiles = 0.08f;
+            state.tension = 12.0f;
+            state.car.speedMph = 0.0f;
+            state.car.lateralOffset = 0.0f;
+            state.car.steeringInterference = 0.0f;
+            state.car.radioOn = true;
+            state.car.radioInterferenceTimer = toyotaAnchorScene || toyotaConsoleScene ? 4.2f : 0.0f;
+            state.car.radioLoose = toyotaAnchorScene || toyotaConsoleScene;
+            state.car.shifterSlipTimer = toyotaAnchorScene || toyotaConsoleScene ? 3.7f : 0.0f;
+            state.car.shifterSlipping = toyotaAnchorScene || toyotaConsoleScene;
+            state.car.doorLock = DoorLockState::Locked;
+            state.car.falseLockState = false;
+            state.story.warning.clear();
+            state.story.messageTimer = 0.0f;
+        } else if (creatureScene) {
             GameState& state = simulation.State();
             state.creature.mode = CreatureMode::Lunging;
             state.creature.variant = frame < 90 ? 0 : 2;
@@ -449,7 +512,23 @@ int RunCapture(const char* outputPath) {
         }
         if (messages.size() > 5) messages.resize(5);
         for (HudMessage& message : messages) message.timer -= 1.0f / 60.0f;
-        renderer.Render(simulation.State(), input, messages);
+        RenderOptions renderOptions {};
+        if (toyotaCalibrationScene) {
+            renderOptions.drawCalibrationRig = true;
+            renderOptions.hideHud = true;
+            renderOptions.brightenCockpit = true;
+            if (toyotaCalibrationFrontScene || toyotaCalibrationLeftScene || toyotaCalibrationTopScene || toyotaConsoleScene) {
+                renderOptions.cameraOverride = true;
+                CockpitCameraMode mode = CockpitCameraMode::ExteriorFront;
+                if (toyotaCalibrationLeftScene) mode = CockpitCameraMode::ExteriorLeft;
+                if (toyotaCalibrationTopScene) mode = CockpitCameraMode::TopDown;
+                if (toyotaConsoleScene) mode = CockpitCameraMode::ConsoleCloseup;
+                renderOptions.overrideCamera = CockpitCamera(simulation.State(), mode);
+            }
+        } else if (toyotaDriverScene) {
+            renderOptions.brightenCockpit = true;
+        }
+        renderer.Render(simulation.State(), input, messages, renderOptions);
         if (frame == 120) {
             TakeScreenshot("linear_drive_capture.png");
         }

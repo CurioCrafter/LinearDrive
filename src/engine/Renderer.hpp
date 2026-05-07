@@ -1,6 +1,7 @@
 #pragma once
 
 #include "engine/Assets.hpp"
+#include "engine/CockpitRig.hpp"
 #include "game/Input.hpp"
 #include "game/Simulation.hpp"
 
@@ -18,11 +19,19 @@ struct HudMessage {
     float intensity = 0.0f;
 };
 
+struct RenderOptions {
+    bool cameraOverride = false;
+    Camera3D overrideCamera {};
+    bool drawCalibrationRig = false;
+    bool hideHud = false;
+    bool brightenCockpit = false;
+};
+
 class Renderer {
 public:
     explicit Renderer(Assets* assets);
 
-    void Render(const GameState& state, const InputState& input, const std::vector<HudMessage>& messages);
+    void Render(const GameState& state, const InputState& input, const std::vector<HudMessage>& messages, const RenderOptions& options = {});
     std::optional<Hotspot> HitTestHotspot(Vector2 mouse) const;
     std::optional<Hotspot> HitTestCockpitControl(Vector2 mouse) const;
     bool HitStart(Vector2 mouse) const;
@@ -48,6 +57,7 @@ private:
 
     Assets* assets_ = nullptr;
     Camera3D camera_ {};
+    RenderOptions renderOptions_ {};
     std::vector<CockpitControl> cockpitControls_;
     Rectangle startButton_ {};
     Rectangle tutorialButton_ {};
@@ -72,6 +82,9 @@ private:
     void DrawCreatureAppendages(Vector3 position, float scale, float alpha, float phase, bool close) const;
     void DrawCreatureEyes(Vector3 position, float width, float size, float alpha) const;
     void DrawCockpit3D(const GameState& state);
+    void DrawCalibrationRig3D(const GameState& state);
+    void DrawCalibrationRigLabels(const GameState& state);
+    void DrawWireBox(BoundingBox box, Color color) const;
     void DrawHud(const GameState& state, const std::vector<HudMessage>& messages);
     void DrawCockpitControlHighlights(const GameState& state, Vector2 mouse);
     void DrawMenu(const GameState& state);
