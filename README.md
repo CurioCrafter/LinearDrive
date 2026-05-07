@@ -42,7 +42,7 @@ To rebuild the installer locally after packaging:
 
 ## Controls
 
-Primary interaction is diegetic: hover and click the modeled cockpit parts inside the car. The radio, ignition, shifter, lock, handle, mirror, headlights, horn, wipers, fan, dome light, glovebox, and window crank all have physical hit areas. Keyboard controls remain as backups:
+Primary interaction is diegetic: hover and click the modeled cockpit parts inside the car. The radio, ignition, shifter, handbrake, lock, handle, mirror, headlights, horn, wipers, fan, dome light, glovebox, and window crank all have physical hit areas. Keyboard controls remain as backups:
 
 - `W/S`: accelerate, brake, reverse when stopped
 - `A/D`: steer
@@ -70,6 +70,7 @@ V3 adds the cockpit and skill gameplay pass:
 
 - The first-person cabin now uses the supplied Toyota RAV4 FBX converted to `assets/models/toyota_rav4_cockpit.glb`; the gameplay radio, shifter, ignition, lock, and other diegetic controls are mounted into that cabin.
 - The Toyota cockpit is calibrated as a car-local 3D rig: +X passenger/right, +Y up, and -Z road/front. The Toyota asset is rotated into that direction with positive scale so the left-hand-drive cabin is not mirrored. Debug capture scenes verify the exterior orientation, driver-eye camera, and projected cockpit anchors.
+- The interior overlay now models the reference-style center stack: twin vents, radio face, clock/buttons, HVAC knobs, console, handbrake, pedals, floor mats, door armrest/handle, crank, and dust wear.
 - The old right-side gameplay button bar has been replaced with modeled cockpit controls and projected hit areas.
 - Loose radio interference can pull the steering. Click the physical radio to stabilize it before the car drifts off the road.
 - Shifter slip can dump the car into neutral or block acceleration. Click the shifter to re-seat it.

@@ -42,8 +42,10 @@ High beams and horn can repel some approaches, but both depend on battery and ti
 
 - Toyota cabin baseline: the windshield, pillars, seats, dash volume, and cabin proportions come from the supplied `Toyotarav6.fbx` model converted for the engine. The horror controls are mounted as readable gameplay affordances inside that interior.
 - Calibrated driver view: the cockpit camera is placed from the car's 3D coordinate rig, with the Toyota front aligned to the road and each clickable control projected from a cabin anchor instead of a screen overlay.
+- Reference-style details: the center stack has visible vents, radio, clock/buttons, HVAC knobs, shifter boot, handbrake, cupholders, pedals, driver-door handle, armrest, lock, and window crank so the controls read as car hardware.
 - Loose radio: bumps, thunder, monster voice events, and impacts can rattle the radio out of its bracket. The steering will start to pull. Keep the lane with A/D, then click the radio to stabilize it.
 - Shifter slip: impacts and console surges can knock the shifter toward neutral. Acceleration will fade or block. Click the shifter to re-seat it.
+- Handbrake: Space still holds the handbrake, and clicking the visible lever gives a quick yank for low-speed correction or panic braking.
 - Door lock lies: monster pressure can jam the lock or make it look locked when it is not. Click the lock during door attacks, and use the mirror when a cue feels suspicious.
 - Ignition stalls: when the engine dies, restart with R or the ignition key, then re-seat the shifter if the console is still loose.
 - Feedback: successful counters reduce tension and push the monster back enough to recover, but only if you respond during the warning window.

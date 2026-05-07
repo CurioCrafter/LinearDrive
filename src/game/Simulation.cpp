@@ -395,6 +395,19 @@ void Simulation::Interact(Hotspot hotspot) {
                 Push(EventType::Warning, "The gearbox grinds and refuses the shift.", 0.42f);
             }
             break;
+        case Hotspot::Handbrake:
+            MarkCockpitFeedback(hotspot);
+            if (std::abs(state_.car.speedMph) > 10.0f) {
+                state_.car.speedMph = Approach(state_.car.speedMph, 0.0f, 9.0f);
+                state_.car.steering = Clamp(state_.car.steering + (state_.car.steering >= 0.0f ? 0.08f : -0.08f), -1.0f, 1.0f);
+                state_.car.condition = Clamp(state_.car.condition - 0.8f, 0.0f, 100.0f);
+                state_.tension += 2.0f;
+                Push(EventType::Interaction, "You yank the handbrake. The rear end twitches before it bites.", 0.36f);
+            } else {
+                state_.car.speedMph = Approach(state_.car.speedMph, 0.0f, 4.5f);
+                Push(EventType::Interaction, "The handbrake ratchet clicks up beside the shifter.", 0.24f);
+            }
+            break;
     }
 
     if (!events_.empty()) {

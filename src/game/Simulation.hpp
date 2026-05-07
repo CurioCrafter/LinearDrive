@@ -81,7 +81,8 @@ enum class Hotspot {
     Wipers,
     WindowCrank,
     DomeLight,
-    GearShift
+    GearShift,
+    Handbrake
 };
 
 enum class EventType {

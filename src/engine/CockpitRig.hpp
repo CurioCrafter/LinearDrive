@@ -44,18 +44,19 @@ inline const CockpitRig& ToyotaCockpitRig() {
     return rig;
 }
 
-inline const std::array<CockpitAnchor, 13>& CockpitAnchors() {
-    static const std::array<CockpitAnchor, 13> anchors {{
+inline const std::array<CockpitAnchor, 14>& CockpitAnchors() {
+    static const std::array<CockpitAnchor, 14> anchors {{
         {Hotspot::Horn, "Horn", {-0.54f, 0.79f, 2.42f}, {74.0f, 58.0f}},
-        {Hotspot::Radio, "Radio", {0.28f, 1.02f, 2.08f}, {100.0f, 60.0f}},
+        {Hotspot::Radio, "Radio", {0.02f, 1.12f, 2.02f}, {152.0f, 76.0f}},
         {Hotspot::Ignition, "Ignition", {-0.18f, 0.77f, 2.18f}, {58.0f, 48.0f}},
         {Hotspot::GearShift, "Shifter", {0.00f, 0.78f, 2.35f}, {78.0f, 88.0f}},
+        {Hotspot::Handbrake, "Handbrake", {-0.08f, 0.96f, 2.42f}, {96.0f, 58.0f}},
         {Hotspot::DoorLock, "Lock", {-1.14f, 1.13f, 2.18f}, {62.0f, 48.0f}},
         {Hotspot::DoorHandle, "Handle", {-1.17f, 0.88f, 2.24f}, {80.0f, 50.0f}},
         {Hotspot::Mirror, "Mirror", {-0.04f, 1.80f, 1.92f}, {118.0f, 50.0f}},
         {Hotspot::Headlights, "Lights", {-0.82f, 0.93f, 2.16f}, {62.0f, 46.0f}},
         {Hotspot::Wipers, "Wipers", {-0.36f, 0.88f, 2.18f}, {62.0f, 46.0f}},
-        {Hotspot::Fan, "Fan", {0.72f, 1.05f, 2.10f}, {64.0f, 56.0f}},
+        {Hotspot::Fan, "Fan", {0.10f, 0.84f, 2.04f}, {82.0f, 62.0f}},
         {Hotspot::DomeLight, "Dome", {0.0f, 1.92f, 2.08f}, {96.0f, 46.0f}},
         {Hotspot::Glovebox, "Glovebox", {0.72f, 0.72f, 2.14f}, {96.0f, 50.0f}},
         {Hotspot::WindowCrank, "Window", {-1.22f, 1.00f, 2.34f}, {62.0f, 60.0f}}
@@ -182,9 +183,9 @@ inline Camera3D CockpitCamera(const GameState& state, CockpitCameraMode mode, co
             camera.fovy = 38.0f;
             break;
         case CockpitCameraMode::ConsoleCloseup:
-            camera.position = CarToWorld(state, Vector3 {-0.32f, 1.12f, 3.08f}, rig);
-            camera.target = CarToWorld(state, Vector3 {0.28f, 0.83f, 2.18f}, rig);
-            camera.fovy = 42.0f;
+            camera.position = CarToWorld(state, Vector3 {-0.42f, 1.20f, 3.05f}, rig);
+            camera.target = CarToWorld(state, Vector3 {0.02f, 0.94f, 2.10f}, rig);
+            camera.fovy = 48.0f;
             break;
         case CockpitCameraMode::Driver:
         default:

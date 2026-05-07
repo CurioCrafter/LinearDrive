@@ -173,6 +173,12 @@ int RunSmokeTests() {
     shiftSkill.Interact(Hotspot::GearShift);
     ok &= Require(shiftSkill.State().car.shifterSlipTimer <= 0.0f && shiftSkill.State().car.gear != 'N', "clicking shifter re-seats gear");
 
+    Simulation handbrakeSkill(3636);
+    handbrakeSkill.Start();
+    handbrakeSkill.State().car.speedMph = 32.0f;
+    handbrakeSkill.Interact(Hotspot::Handbrake);
+    ok &= Require(handbrakeSkill.State().car.speedMph < 32.0f && handbrakeSkill.State().car.lastCockpitControl == Hotspot::Handbrake, "clicking handbrake tugs the car down");
+
     Simulation skillChain(4444);
     skillChain.Start();
     skillChain.State().distanceMiles = 2.35f;

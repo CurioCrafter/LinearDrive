@@ -665,7 +665,6 @@ void Renderer::DrawCockpit3D(const GameState& state) {
     const Color trim = Color {82, 76, 63, 255};
     const Color softBlack = Color {10, 12, 12, 245};
     const Color panel = Color {20, 22, 20, 238};
-    const Color liveTeal = Color {59, 162, 145, 255};
     const float wheelPull = state.car.steering * 12.0f + state.car.steeringInterference * 18.0f;
 
     rlDisableDepthTest();
@@ -674,6 +673,7 @@ void Renderer::DrawCockpit3D(const GameState& state) {
     const Vector3 radio = A(Hotspot::Radio);
     const Vector3 ignition = A(Hotspot::Ignition);
     const Vector3 shifter = A(Hotspot::GearShift);
+    const Vector3 handbrake = A(Hotspot::Handbrake);
     const Vector3 lock = A(Hotspot::DoorLock);
     const Vector3 handle = A(Hotspot::DoorHandle);
     const Vector3 mirror = A(Hotspot::Mirror);
@@ -683,14 +683,27 @@ void Renderer::DrawCockpit3D(const GameState& state) {
     const Vector3 dome = A(Hotspot::DomeLight);
     const Vector3 glovebox = A(Hotspot::Glovebox);
     const Vector3 window = A(Hotspot::WindowCrank);
+    const Color vinyl = Color {24, 25, 23, 242};
+    const Color oldPlastic = Color {34, 34, 31, 246};
+    const Color recessed = Color {4, 5, 5, 250};
+    const Color dust = Color {118, 98, 72, 164};
 
-    DrawCube(P(Add3(radio, {0.0f, -0.03f, -0.02f})), 0.92f, 0.45f, 0.07f, Color {15, 16, 15, 236});
-    DrawCube(P(Add3(shifter, {0.06f, -0.42f, 0.25f})), 0.62f, 0.30f, 0.36f, Color {13, 14, 13, 236});
-    DrawCube(P({-0.46f, 0.86f, 2.14f}), 0.92f, 0.20f, 0.05f, Color {16, 18, 17, 226});
+    DrawCube(P({0.10f, 0.94f, 2.03f}), 1.06f, 0.82f, 0.12f, Color {22, 23, 21, 242});
+    DrawCube(P({0.58f, 0.86f, 2.08f}), 0.88f, 0.46f, 0.08f, oldPlastic);
+    DrawCube(P({-0.48f, 0.87f, 2.13f}), 0.98f, 0.24f, 0.06f, Color {16, 18, 17, 232});
+    DrawCube(P(Add3(shifter, {0.10f, -0.45f, 0.33f})), 0.86f, 0.22f, 0.82f, Color {12, 13, 12, 240});
+    DrawCube(P(Add3(shifter, {0.10f, -0.31f, 0.58f})), 0.74f, 0.07f, 0.42f, Color {25, 25, 22, 245});
+    DrawCylinder(P(Add3(shifter, {0.05f, -0.25f, 0.74f})), 0.14f, 0.14f, 0.035f, 24, recessed);
+    DrawCylinder(P(Add3(shifter, {0.30f, -0.25f, 0.74f})), 0.13f, 0.13f, 0.035f, 24, recessed);
 
-    DrawSphere(P({-0.66f, 0.96f, 2.15f}), 0.09f, gaugeGlow);
-    DrawSphere(P({-0.42f, 0.96f, 2.15f}), 0.07f, gaugeGlow);
-    DrawCube(P({-0.54f, 0.83f, 2.14f}), 0.56f, 0.06f, 0.035f, Color {111, 82, 47, 255});
+    DrawCube(P({-0.58f, 0.98f, 2.10f}), 0.72f, 0.30f, 0.08f, Color {8, 9, 9, 242});
+    DrawSphere(P({-0.78f, 1.00f, 2.14f}), 0.105f, Color {21, 25, 24, 255});
+    DrawSphere(P({-0.58f, 1.00f, 2.14f}), 0.092f, Color {21, 25, 24, 255});
+    DrawSphere(P({-0.39f, 0.99f, 2.14f}), 0.064f, Color {21, 25, 24, 255});
+    DrawSphere(P({-0.78f, 1.00f, 2.18f}), 0.038f, gaugeGlow);
+    DrawSphere(P({-0.58f, 1.00f, 2.18f}), 0.034f, gaugeGlow);
+    DrawSphere(P({-0.39f, 0.99f, 2.18f}), 0.026f, gaugeGlow);
+    DrawCube(P({-0.56f, 0.82f, 2.16f}), 0.48f, 0.045f, 0.035f, Color {102, 76, 49, 255});
 
     DrawCylinderEx(P(Add3(horn, {0.0f, 0.0f, 0.15f})), P(Add3(horn, {0.0f, 0.0f, -0.13f})), 0.38f, 0.38f, 36, softBlack);
     DrawCylinderEx(P(Add3(horn, {0.0f, 0.0f, 0.17f})), P(Add3(horn, {0.0f, 0.0f, -0.15f})), 0.24f, 0.24f, 36, Color {20, 22, 21, 255});
@@ -703,25 +716,70 @@ void Renderer::DrawCockpit3D(const GameState& state) {
     DrawCube(P(wipers), 0.25f, 0.07f, 0.05f, state.car.wipersOn ? Color {145, 171, 172, 255} : Color {55, 57, 53, 255});
 
     const float radioShake = state.car.radioInterferenceTimer > 0.0f ? std::sin(state.elapsed * 28.0f) * 0.035f : 0.0f;
-    DrawCube(P(Add3(radio, {radioShake, 0.0f, 0.0f})), 0.78f, 0.30f, 0.08f, state.car.radioLoose ? Color {88, 47, 36, 255} : panel);
-    DrawCube(P(Add3(radio, {radioShake, 0.03f, 0.05f})), 0.48f, 0.075f, 0.045f, state.car.radioOn ? liveTeal : Color {14, 23, 21, 255});
-    DrawSphere(P(Add3(radio, {-0.34f + radioShake, 0.0f, 0.06f})), 0.052f, trim);
-    DrawSphere(P(Add3(radio, {0.34f + radioShake, 0.0f, 0.06f})), 0.052f, trim);
+    for (int side = -1; side <= 1; side += 2) {
+        const Vector3 vent = Add3(radio, {side * 0.23f, 0.34f, -0.01f});
+        DrawCube(P(vent), 0.38f, 0.16f, 0.055f, recessed);
+        for (int slat = 0; slat < 4; ++slat) {
+            DrawCube(P(Add3(vent, {0.0f, -0.055f + slat * 0.035f, 0.04f})), 0.32f, 0.008f, 0.025f, Color {82, 82, 72, 255});
+        }
+        DrawCube(P(Add3(vent, {0.0f, 0.0f, 0.055f})), 0.055f, 0.028f, 0.025f, Color {126, 118, 96, 255});
+    }
+    DrawCube(P(Add3(radio, {radioShake, 0.20f, 0.025f})), 0.34f, 0.09f, 0.045f, Color {4, 8, 7, 250});
+    DrawCube(P(Add3(radio, {radioShake, 0.20f, 0.055f})), 0.16f, 0.032f, 0.022f, state.car.radioOn ? Color {90, 211, 135, 255} : Color {70, 86, 61, 255});
+    for (int i = 0; i < 5; ++i) {
+        const float x = -0.30f + i * 0.15f;
+        DrawCube(P(Add3(radio, {x, 0.115f, 0.055f})), 0.075f, 0.055f, 0.028f, i == 0 ? Color {92, 43, 36, 255} : Color {50, 52, 47, 255});
+    }
+    DrawCube(P(Add3(radio, {radioShake, 0.0f, 0.0f})), 0.84f, 0.32f, 0.10f, state.car.radioLoose ? Color {112, 58, 43, 255} : Color {30, 31, 28, 248});
+    DrawCube(P(Add3(radio, {radioShake, 0.038f, 0.068f})), 0.54f, 0.090f, 0.035f, state.car.radioOn ? Color {75, 214, 164, 255} : Color {42, 54, 38, 255});
+    DrawCube(P(Add3(radio, {radioShake, -0.055f, 0.061f})), 0.50f, 0.026f, 0.030f, recessed);
+    for (int i = 0; i < 6; ++i) {
+        DrawCube(P(Add3(radio, {-0.235f + i * 0.094f + radioShake, -0.105f, 0.065f})), 0.060f, 0.035f, 0.026f, Color {72, 66, 55, 255});
+    }
+    DrawCylinderEx(P(Add3(radio, {-0.37f + radioShake, 0.0f, 0.055f})), P(Add3(radio, {-0.37f + radioShake, 0.0f, 0.115f})), 0.064f, 0.056f, 22, trim);
+    DrawCylinderEx(P(Add3(radio, {0.37f + radioShake, 0.0f, 0.055f})), P(Add3(radio, {0.37f + radioShake, 0.0f, 0.115f})), 0.064f, 0.056f, 22, trim);
 
     const float fanSpin = state.car.fan == FanState::Stopped ? 0.0f : (state.car.fan == FanState::Slow ? 0.35f : (state.car.fan == FanState::Irregular ? 0.66f + std::sin(state.elapsed * 13.0f) * 0.25f : 1.0f));
-    DrawCylinder(P(fan), 0.17f, 0.17f, 0.05f, 24, Color {37, 41, 41, 255});
+    DrawCube(P(Add3(fan, {-0.22f, 0.0f, -0.015f})), 0.74f, 0.26f, 0.07f, Color {17, 18, 17, 246});
+    for (int knob = 0; knob < 3; ++knob) {
+        const Vector3 knobCenter = Add3(fan, {-0.49f + knob * 0.27f, 0.01f, 0.055f});
+        DrawCylinderEx(P(Add3(knobCenter, {0.0f, 0.0f, -0.025f})), P(Add3(knobCenter, {0.0f, 0.0f, 0.055f})), 0.072f, 0.062f, 22, Color {53, 55, 50, 255});
+        DrawCube(P(Add3(knobCenter, {0.0f, 0.035f, 0.08f})), 0.030f, 0.075f, 0.025f, Color {133, 123, 96, 255});
+    }
+    DrawCube(P(Add3(fan, {-0.49f, -0.095f, 0.063f})), 0.13f, 0.025f, 0.020f, Color {67, 123, 163, 255});
+    DrawCube(P(Add3(fan, {0.05f, -0.095f, 0.063f})), 0.13f, 0.025f, 0.020f, Color {169, 70, 54, 255});
     for (int i = 0; i < 4; ++i) {
         const float angle = state.elapsed * 9.0f * fanSpin + static_cast<float>(i) * 1.5707963f;
-        DrawCube(P(Add3(fan, {std::cos(angle) * 0.08f, std::sin(angle) * 0.08f, 0.06f})), 0.16f, 0.03f, 0.03f, Color {116, 119, 112, 255});
+        DrawCube(P(Add3(fan, {0.18f + std::cos(angle) * 0.08f, 0.01f + std::sin(angle) * 0.08f, 0.08f})), 0.16f, 0.03f, 0.03f, Color {116, 119, 112, 255});
     }
+    DrawCube(P(Add3(fan, {-0.22f, -0.27f, -0.015f})), 0.64f, 0.15f, 0.06f, recessed);
+    DrawCube(P(Add3(fan, {-0.22f, -0.27f, 0.035f})), 0.54f, 0.030f, 0.025f, Color {66, 61, 51, 255});
     DrawCube(P(glovebox), 0.64f, 0.24f, 0.07f, panel);
     DrawCube(P(Add3(glovebox, {0.0f, 0.03f, 0.05f})), 0.50f, 0.03f, 0.025f, Color {83, 76, 61, 255});
 
-    DrawCube(P(Add3(handle, {0.0f, 0.0f, 0.04f})), 0.14f, 0.42f, 0.68f, Color {18, 18, 17, 238});
+    DrawCube(P({-0.52f, 0.31f, 2.18f}), 0.74f, 0.045f, 0.44f, Color {16, 16, 14, 244});
+    for (int pedal = 0; pedal < 3; ++pedal) {
+        const float x = -0.78f + pedal * 0.22f;
+        const float h = pedal == 2 ? 0.22f : 0.17f;
+        DrawCube(P({x, 0.36f, 2.08f}), 0.11f, h, 0.035f, Color {58, 55, 47, 255});
+        for (int rib = 0; rib < 3; ++rib) {
+            DrawCube(P({x, 0.30f + rib * 0.045f, 2.11f}), 0.085f, 0.006f, 0.018f, Color {128, 116, 88, 190});
+        }
+    }
+    for (int rib = 0; rib < 8; ++rib) {
+        DrawCube(P({-0.36f, 0.235f, 2.40f + rib * 0.045f}), 0.62f, 0.012f, 0.010f, dust);
+    }
+
+    DrawCube(P(Add3(handle, {-0.02f, 0.05f, 0.08f})), 0.20f, 0.74f, 0.74f, Color {18, 18, 17, 238});
+    DrawCube(P({-1.30f, 0.95f, 2.36f}), 0.16f, 0.50f, 0.74f, vinyl);
+    DrawCube(P({-1.21f, 0.84f, 2.32f}), 0.11f, 0.12f, 0.54f, Color {62, 58, 48, 255});
+    DrawCube(P({-1.18f, 0.70f, 2.44f}), 0.10f, 0.08f, 0.62f, Color {22, 23, 21, 244});
     DrawCube(P(lock), 0.10f, 0.10f, 0.10f, state.car.doorLock == DoorLockState::Locked ? Amber() : Color {70, 70, 66, 255});
-    DrawCube(P(handle), state.car.doorHandleBroken ? 0.08f : 0.32f, 0.07f, 0.12f, state.car.doorHandleBroken ? Color {112, 63, 52, 255} : Color {116, 104, 83, 255});
-    DrawCylinder(P(window), 0.09f, 0.09f, 0.04f, 20, Color {72, 68, 58, 255});
-    DrawSphere(P(Add3(window, {0.0f, -0.09f, 0.02f})), 0.038f, trim);
+    DrawCube(P(handle), state.car.doorHandleBroken ? 0.08f : 0.35f, 0.075f, 0.13f, state.car.doorHandleBroken ? Color {112, 63, 52, 255} : Color {116, 104, 83, 255});
+    DrawCube(P(Add3(handle, {0.0f, -0.16f, 0.10f})), 0.46f, 0.055f, 0.08f, Color {77, 72, 60, 255});
+    DrawCylinderEx(P(Add3(window, {0.0f, 0.0f, -0.025f})), P(Add3(window, {0.0f, 0.0f, 0.045f})), 0.09f, 0.09f, 20, Color {72, 68, 58, 255});
+    DrawCylinderEx(P(Add3(window, {0.02f, -0.02f, 0.045f})), P(Add3(window, {0.02f, -0.14f, 0.08f})), 0.024f, 0.020f, 10, trim);
+    DrawSphere(P(Add3(window, {0.02f, -0.16f, 0.09f})), 0.040f, trim);
 
     DrawCube(P(mirror), 0.96f, 0.18f, 0.05f, softBlack);
     if (state.creature.mirrorVisible) {
@@ -732,9 +790,28 @@ void Renderer::DrawCockpit3D(const GameState& state) {
     DrawCube(P(dome), 0.64f, 0.07f, 0.18f, state.car.domeLightOn ? Color {214, 190, 130, 255} : Color {29, 30, 27, 255});
 
     const float slip = state.car.shifterSlipTimer > 0.0f ? std::sin(state.elapsed * 18.0f) * 0.16f : 0.0f;
-    DrawCube(P(Add3(shifter, {0.0f, -0.40f, 0.22f})), 0.52f, 0.13f, 0.34f, Color {19, 20, 19, 255});
-    DrawCylinderEx(P(Add3(shifter, {slip, -0.34f, 0.16f})), P(Add3(shifter, {slip * 1.35f, -0.02f, 0.0f})), 0.038f, 0.032f, 12, Color {92, 87, 75, 255});
-    DrawSphere(P(Add3(shifter, {slip * 1.5f, 0.0f, 0.0f})), 0.085f, state.car.shifterSlipping ? Color {179, 63, 48, 255} : trim);
+    DrawCube(P(Add3(shifter, {0.0f, -0.40f, 0.22f})), 0.56f, 0.13f, 0.38f, Color {19, 20, 19, 255});
+    for (int boot = 0; boot < 4; ++boot) {
+        const float width = 0.34f - boot * 0.045f;
+        DrawCube(P(Add3(shifter, {slip * 0.20f, -0.30f + boot * 0.055f, 0.13f - boot * 0.025f})), width, 0.035f, width * 0.78f, Color {31, 30, 27, 255});
+    }
+    DrawCylinderEx(P(Add3(shifter, {slip, -0.25f, 0.09f})), P(Add3(shifter, {slip * 1.35f, 0.07f, -0.02f})), 0.044f, 0.034f, 14, Color {92, 87, 75, 255});
+    DrawSphere(P(Add3(shifter, {slip * 1.5f, 0.13f, -0.05f})), 0.095f, state.car.shifterSlipping ? Color {179, 63, 48, 255} : trim);
+    DrawCube(P(Add3(shifter, {slip * 1.5f, 0.18f, -0.05f})), 0.12f, 0.015f, 0.045f, Color {192, 181, 145, 180});
+
+    const bool handbrakeRecent = state.car.cockpitFeedbackTimer > 0.0f && state.car.lastCockpitControl == Hotspot::Handbrake;
+    DrawCube(P(Add3(handbrake, {-0.04f, -0.35f, 0.26f})), 0.26f, 0.08f, 0.40f, Color {13, 14, 13, 252});
+    DrawCylinderEx(P(Add3(handbrake, {-0.12f, -0.30f, 0.30f})), P(Add3(handbrake, {0.13f, 0.00f, -0.10f})), 0.030f, 0.032f, 12, Color {32, 31, 27, 255});
+    DrawCylinderEx(P(Add3(handbrake, {0.08f, -0.03f, -0.06f})), P(Add3(handbrake, {0.23f, 0.06f, -0.17f})), 0.056f, 0.060f, 14, handbrakeRecent ? Amber() : Color {14, 15, 14, 255});
+    DrawCube(P(Add3(handbrake, {0.24f, 0.07f, -0.18f})), 0.15f, 0.058f, 0.11f, handbrakeRecent ? Amber() : Color {24, 25, 22, 255});
+    DrawSphere(P(Add3(handbrake, {0.31f, 0.08f, -0.22f})), 0.032f, Color {162, 46, 36, 255});
+
+    for (int speck = 0; speck < 18; ++speck) {
+        const float x = -0.90f + static_cast<float>((speck * 37) % 140) * 0.010f;
+        const float y = 0.92f + static_cast<float>((speck * 19) % 26) * 0.006f;
+        const float z = 2.04f + static_cast<float>((speck * 23) % 38) * 0.003f;
+        DrawCube(P({x, y, z}), 0.026f, 0.006f, 0.006f, dust);
+    }
 
     rlEnableDepthTest();
 }
@@ -756,7 +833,7 @@ void Renderer::DrawCalibrationRig3D(const GameState& state) {
         Color color = Color {105, 230, 205, 255};
         if (anchor.hotspot == Hotspot::Horn || anchor.hotspot == Hotspot::Ignition) color = Color {255, 184, 83, 255};
         if (anchor.hotspot == Hotspot::DoorLock || anchor.hotspot == Hotspot::DoorHandle || anchor.hotspot == Hotspot::WindowCrank) color = Color {231, 96, 75, 255};
-        if (anchor.hotspot == Hotspot::GearShift) color = Color {180, 135, 255, 255};
+        if (anchor.hotspot == Hotspot::GearShift || anchor.hotspot == Hotspot::Handbrake) color = Color {180, 135, 255, 255};
         DrawSphere(world, 0.055f, color);
         DrawLine3D(world, Add3(world, {0.0f, 0.16f, 0.0f}), color);
     }
@@ -887,7 +964,7 @@ void Renderer::DrawHud(const GameState& state, const std::vector<HudMessage>& me
     DrawMeter(Rectangle {static_cast<float>(w - 250), static_cast<float>(h - 74), 202.0f, 14.0f}, "SLOW RISK", state.creature.slowHuntTimer / 2.65f, Color {210, 47, 32, 235});
 
     if (state.car.radioInterferenceTimer > 0.0f || state.car.shifterSlipTimer > 0.0f) {
-        const int faultY = h - 338;
+        const int faultY = 112;
         DrawPanel(Rectangle {static_cast<float>(w - 330), static_cast<float>(faultY), 306, 88}, Color {18, 8, 7, 224}, Color {205, 75, 49, 172});
         DrawText("COCKPIT FAULT", w - 310, faultY + 18, 12, Color {255, 164, 124, 255});
         if (state.car.radioInterferenceTimer > 0.0f) {
@@ -1066,7 +1143,7 @@ void Renderer::DrawTutorial(const GameState&) {
     const std::array<std::array<const char*, 4>, 3> lines {{
         {{"W accelerates", "S brakes or reverses", "A/D keep centered", "Do not coast during a hunt"}},
         {{"Click radio to stop pull", "Click shifter to re-seat", "Click lock during attacks", "Mirror exposes fake cues"}},
-        {{"R or ignition restarts", "Shift burns high beams", "H or horn buys space", "Use speed before risk fills"}}
+        {{"R or ignition restarts", "Space or handbrake tugs", "H or horn buys space", "Use speed before risk fills"}}
     }};
 
     for (int i = 0; i < 3; ++i) {
@@ -1282,6 +1359,7 @@ const char* Renderer::HotspotLabel(Hotspot hotspot) {
         case Hotspot::WindowCrank: return "Window";
         case Hotspot::DomeLight: return "Dome";
         case Hotspot::GearShift: return "Shifter";
+        case Hotspot::Handbrake: return "Handbrake";
     }
     return "Control";
 }
