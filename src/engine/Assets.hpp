@@ -27,6 +27,7 @@ struct Assets {
     Model stumpRound {};
     Model roadSign {};
     Model sedan {};
+    Model toyotaCockpit {};
     Model debrisDoor {};
     Model debrisTire {};
     Model horrorMonster {};

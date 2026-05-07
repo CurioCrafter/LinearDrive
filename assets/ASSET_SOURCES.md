@@ -37,6 +37,14 @@ All selected third-party runtime assets are permissively licensed and copied und
   - `assets/models/debris-door.glb`
   - `assets/models/debris-tire.glb`
 
+## Toyota RAV4 cockpit baseline
+
+- Source: user-provided local model
+- Original file: `C:\Users\andre\Desktop\Organized Desktop\03 Creative Assets and References\Blender\ToyotaRav4\Toyotarav6.fbx`
+- Runtime conversion: `assets/models/toyota_rav4_cockpit.glb`
+- Conversion tool: `FBX2glTF 0.9.7-p1`
+- Used as the first-person vehicle interior baseline. Procedural/diegetic control affordances are layered onto the model so gameplay controls line up with visible car parts.
+
 ## Kenney Interface Sounds
 
 - Source: https://kenney.nl/assets/interface-sounds

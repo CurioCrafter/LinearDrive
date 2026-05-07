@@ -42,6 +42,7 @@ bool AssetStore::Load() {
     assets_.stumpRound = LoadModelSafe(AssetPath("models/stump_roundDetailed.obj").c_str());
     assets_.roadSign = LoadModelSafe(AssetPath("models/sign.obj").c_str());
     assets_.sedan = LoadModelSafe(AssetPath("models/sedan.glb").c_str());
+    assets_.toyotaCockpit = LoadModelSafe(AssetPath("models/toyota_rav4_cockpit.glb").c_str());
     assets_.debrisDoor = LoadModelSafe(AssetPath("models/debris-door.glb").c_str());
     assets_.debrisTire = LoadModelSafe(AssetPath("models/debris-tire.glb").c_str());
     assets_.horrorMonster = LoadModelSafe(AssetPath("models/creature_stalker.glb").c_str());
@@ -104,6 +105,7 @@ void AssetStore::Unload() {
     UnloadModel(assets_.stumpRound);
     UnloadModel(assets_.roadSign);
     UnloadModel(assets_.sedan);
+    UnloadModel(assets_.toyotaCockpit);
     UnloadModel(assets_.debrisDoor);
     UnloadModel(assets_.debrisTire);
     UnloadModel(assets_.horrorMonster);

@@ -1,5 +1,7 @@
 #include "engine/Renderer.hpp"
 
+#include "rlgl.h"
+
 #include <algorithm>
 #include <cmath>
 #include <sstream>
@@ -13,6 +15,34 @@ Color UiPanel() { return Color {9, 12, 12, 216}; }
 Color UiBorder() { return Color {188, 168, 119, 155}; }
 Color Amber() { return Color {255, 186, 88, 255}; }
 Color PaleEye() { return Color {214, 245, 214, 255}; }
+
+constexpr Vector3 kToyotaCockpitOffset {0.0f, -0.62f, 2.86f};
+constexpr Vector3 kToyotaCockpitScale {3.15f, 3.15f, 3.15f};
+
+struct CockpitControlDef {
+    Hotspot hotspot;
+    float x;
+    float y;
+    float z;
+    float w;
+    float h;
+};
+
+const std::array<CockpitControlDef, 13> kCockpitControlDefs {{
+    {Hotspot::Horn, 0.02f, 0.77f, 2.30f, 74.0f, 58.0f},
+    {Hotspot::Radio, 0.20f, 1.02f, 2.06f, 100.0f, 60.0f},
+    {Hotspot::Ignition, 0.16f, 0.75f, 2.16f, 58.0f, 48.0f},
+    {Hotspot::GearShift, 0.28f, 0.39f, 2.66f, 76.0f, 88.0f},
+    {Hotspot::DoorLock, -0.62f, 1.16f, 2.04f, 60.0f, 48.0f},
+    {Hotspot::DoorHandle, -0.66f, 0.92f, 2.08f, 78.0f, 50.0f},
+    {Hotspot::Mirror, 0.00f, 1.76f, 1.88f, 118.0f, 50.0f},
+    {Hotspot::Headlights, -0.38f, 0.91f, 2.14f, 60.0f, 46.0f},
+    {Hotspot::Wipers, -0.12f, 0.87f, 2.14f, 60.0f, 46.0f},
+    {Hotspot::Fan, 0.64f, 1.06f, 2.08f, 64.0f, 56.0f},
+    {Hotspot::DomeLight, 0.00f, 2.06f, 2.35f, 96.0f, 46.0f},
+    {Hotspot::Glovebox, 0.74f, 0.72f, 2.12f, 94.0f, 50.0f},
+    {Hotspot::WindowCrank, -0.82f, 1.00f, 2.20f, 60.0f, 60.0f}
+}};
 
 std::string Percent(float value) {
     std::ostringstream stream;
@@ -219,34 +249,9 @@ void Renderer::BuildCockpitControls(const GameState& state) {
         return;
     }
 
-    struct ControlDef {
-        Hotspot hotspot;
-        float x;
-        float y;
-        float z;
-        float w;
-        float h;
-    };
-
-    const std::array<ControlDef, 13> defs {{
-        {Hotspot::Horn, -0.50f, 0.73f, 1.82f, 70.0f, 56.0f},
-        {Hotspot::Radio, 0.86f, 0.91f, 1.56f, 88.0f, 56.0f},
-        {Hotspot::Ignition, 0.08f, 0.69f, 1.58f, 56.0f, 48.0f},
-        {Hotspot::GearShift, 0.42f, 0.34f, 2.02f, 74.0f, 84.0f},
-        {Hotspot::DoorLock, -2.32f, 1.08f, 1.18f, 58.0f, 48.0f},
-        {Hotspot::DoorHandle, -2.26f, 0.72f, 1.14f, 76.0f, 48.0f},
-        {Hotspot::Mirror, 0.00f, 1.82f, 0.98f, 116.0f, 50.0f},
-        {Hotspot::Headlights, -0.95f, 0.90f, 1.56f, 58.0f, 46.0f},
-        {Hotspot::Wipers, 0.33f, 0.84f, 1.56f, 58.0f, 46.0f},
-        {Hotspot::Fan, 1.62f, 1.05f, 1.54f, 62.0f, 56.0f},
-        {Hotspot::DomeLight, 0.00f, 2.30f, 0.60f, 92.0f, 44.0f},
-        {Hotspot::Glovebox, 1.65f, 0.68f, 1.54f, 92.0f, 48.0f},
-        {Hotspot::WindowCrank, -2.46f, 0.91f, 1.20f, 58.0f, 58.0f}
-    }};
-
     const int w = GetScreenWidth();
     const int h = GetScreenHeight();
-    for (const ControlDef& def : defs) {
+    for (const CockpitControlDef& def : kCockpitControlDefs) {
         const Vector3 world = CockpitPoint(state, def.x, def.y, def.z);
         const Vector2 screen = GetWorldToScreen(world, camera_);
         if (screen.x < -80.0f || screen.x > static_cast<float>(w) + 80.0f || screen.y < -80.0f || screen.y > static_cast<float>(h) + 80.0f) {
@@ -653,63 +658,85 @@ void Renderer::DrawCreatureEyes(Vector3 position, float width, float size, float
 }
 
 void Renderer::DrawCockpit3D(const GameState& state) {
-    const float x = state.car.lateralOffset;
-    DrawCube(CockpitPoint(state, 0.0f, 0.48f, 1.18f), 5.4f, 0.78f, 0.55f, Color {22, 24, 22, 255});
-    DrawCube(CockpitPoint(state, 0.0f, 0.92f, 0.86f), 5.7f, 0.12f, 0.18f, Color {8, 10, 10, 255});
-    DrawCube(CockpitPoint(state, -2.85f, 1.45f, 0.7f), 0.16f, 2.3f, 0.26f, Color {10, 12, 12, 255});
-    DrawCube(CockpitPoint(state, 2.85f, 1.45f, 0.7f), 0.16f, 2.3f, 0.26f, Color {10, 12, 12, 255});
-    DrawCube(CockpitPoint(state, 0.0f, 2.46f, 0.58f), 5.7f, 0.18f, 0.28f, Color {6, 7, 7, 255});
+    if (ModelReady(assets_->toyotaCockpit)) {
+        DrawModelIfReady(
+            assets_->toyotaCockpit,
+            CockpitPoint(state, kToyotaCockpitOffset.x, kToyotaCockpitOffset.y, kToyotaCockpitOffset.z),
+            Vector3 {0, 1, 0},
+            0.0f,
+            kToyotaCockpitScale,
+            Color {178, 170, 150, 255}
+        );
+    } else {
+        DrawCube(CockpitPoint(state, 0.0f, 0.48f, 1.18f), 5.4f, 0.78f, 0.55f, Color {22, 24, 22, 255});
+        DrawCube(CockpitPoint(state, 0.0f, 0.92f, 0.86f), 5.7f, 0.12f, 0.18f, Color {8, 10, 10, 255});
+        DrawCube(CockpitPoint(state, -2.85f, 1.45f, 0.7f), 0.16f, 2.3f, 0.26f, Color {10, 12, 12, 255});
+        DrawCube(CockpitPoint(state, 2.85f, 1.45f, 0.7f), 0.16f, 2.3f, 0.26f, Color {10, 12, 12, 255});
+        DrawCube(CockpitPoint(state, 0.0f, 2.46f, 0.58f), 5.7f, 0.18f, 0.28f, Color {6, 7, 7, 255});
+    }
 
     const Color gaugeGlow = state.car.engineOn ? Color {235, 153, 71, 255} : Color {94, 60, 44, 255};
-    DrawSphere(CockpitPoint(state, -0.72f, 0.92f, 1.56f), 0.14f, gaugeGlow);
-    DrawSphere(CockpitPoint(state, -0.25f, 0.92f, 1.56f), 0.11f, gaugeGlow);
-
     const Color trim = Color {82, 76, 63, 255};
+    const Color softBlack = Color {10, 12, 12, 245};
+    const Color panel = Color {20, 22, 20, 238};
+    const Color liveTeal = Color {59, 162, 145, 255};
     const float wheelPull = state.car.steering * 12.0f + state.car.steeringInterference * 18.0f;
-    DrawCylinderEx(CockpitPoint(state, -0.52f, 0.72f, 1.88f), CockpitPoint(state, -0.52f, 0.72f, 1.70f), 0.44f, 0.44f, 36, Color {9, 10, 10, 255});
-    DrawCylinderEx(CockpitPoint(state, -0.52f, 0.72f, 1.90f), CockpitPoint(state, -0.52f, 0.72f, 1.68f), 0.30f, 0.30f, 36, Color {21, 23, 22, 255});
-    DrawCube(CockpitPoint(state, -0.52f + std::sin(wheelPull * DEG2RAD) * 0.07f, 0.72f, 1.78f), 0.68f, 0.075f, 0.06f, trim);
-    DrawCube(CockpitPoint(state, -0.52f, 0.72f + std::cos(wheelPull * DEG2RAD) * 0.05f, 1.78f), 0.075f, 0.62f, 0.06f, trim);
-    DrawSphere(CockpitPoint(state, -0.52f, 0.72f, 1.66f), 0.13f, state.car.cockpitFeedbackTimer > 0.0f && state.car.lastCockpitControl == Hotspot::Horn ? Amber() : Color {18, 19, 18, 255});
 
-    DrawCylinder(CockpitPoint(state, 0.08f, 0.70f, 1.58f), 0.085f, 0.085f, 0.035f, 18, state.car.engineOn ? Amber() : Color {62, 58, 49, 255});
-    DrawCube(CockpitPoint(state, -0.96f, 0.9f, 1.58f), 0.22f, 0.16f, 0.055f, state.car.headlightsOn ? Color {198, 173, 112, 255} : Color {41, 43, 39, 255});
-    DrawCube(CockpitPoint(state, 0.33f, 0.84f, 1.58f), 0.3f, 0.08f, 0.055f, state.car.wipersOn ? Color {145, 171, 172, 255} : Color {55, 57, 53, 255});
+    rlDisableDepthTest();
+
+    DrawCube(CockpitPoint(state, 0.20f, 0.99f, 2.06f), 0.92f, 0.45f, 0.07f, Color {15, 16, 15, 236});
+    DrawCube(CockpitPoint(state, 0.28f, 0.42f, 2.56f), 0.62f, 0.30f, 0.36f, Color {13, 14, 13, 236});
+    DrawCube(CockpitPoint(state, -0.18f, 0.84f, 2.13f), 0.74f, 0.20f, 0.05f, Color {16, 18, 17, 226});
+
+    DrawSphere(CockpitPoint(state, -0.28f, 0.94f, 2.15f), 0.09f, gaugeGlow);
+    DrawSphere(CockpitPoint(state, -0.06f, 0.94f, 2.15f), 0.07f, gaugeGlow);
+    DrawCube(CockpitPoint(state, -0.17f, 0.81f, 2.14f), 0.58f, 0.06f, 0.035f, Color {111, 82, 47, 255});
+
+    DrawCylinderEx(CockpitPoint(state, 0.02f, 0.77f, 2.43f), CockpitPoint(state, 0.02f, 0.77f, 2.20f), 0.38f, 0.38f, 36, softBlack);
+    DrawCylinderEx(CockpitPoint(state, 0.02f, 0.77f, 2.445f), CockpitPoint(state, 0.02f, 0.77f, 2.19f), 0.24f, 0.24f, 36, Color {20, 22, 21, 255});
+    DrawCube(CockpitPoint(state, 0.02f + std::sin(wheelPull * DEG2RAD) * 0.055f, 0.77f, 2.285f), 0.58f, 0.06f, 0.055f, trim);
+    DrawCube(CockpitPoint(state, 0.02f, 0.77f + std::cos(wheelPull * DEG2RAD) * 0.045f, 2.285f), 0.06f, 0.50f, 0.055f, trim);
+    DrawSphere(CockpitPoint(state, 0.02f, 0.77f, 2.17f), 0.105f, state.car.cockpitFeedbackTimer > 0.0f && state.car.lastCockpitControl == Hotspot::Horn ? Amber() : Color {24, 25, 24, 255});
+
+    DrawSphere(CockpitPoint(state, 0.16f, 0.75f, 2.16f), 0.075f, state.car.engineOn ? Amber() : Color {62, 58, 49, 255});
+    DrawCube(CockpitPoint(state, -0.38f, 0.91f, 2.14f), 0.20f, 0.13f, 0.05f, state.car.headlightsOn ? Color {198, 173, 112, 255} : Color {41, 43, 39, 255});
+    DrawCube(CockpitPoint(state, -0.12f, 0.87f, 2.14f), 0.25f, 0.07f, 0.05f, state.car.wipersOn ? Color {145, 171, 172, 255} : Color {55, 57, 53, 255});
 
     const float radioShake = state.car.radioInterferenceTimer > 0.0f ? std::sin(state.elapsed * 28.0f) * 0.035f : 0.0f;
-    DrawCube(CockpitPoint(state, 0.86f + radioShake, 0.88f, 1.52f), 0.9f, 0.34f, 0.08f, state.car.radioLoose ? Color {73, 49, 38, 255} : Color {28, 31, 29, 255});
-    DrawCube(CockpitPoint(state, 0.86f + radioShake, 0.9f, 1.58f), 0.52f, 0.08f, 0.04f, state.car.radioOn ? Color {59, 162, 145, 255} : Color {14, 23, 21, 255});
-    DrawCylinder(CockpitPoint(state, 0.47f + radioShake, 0.89f, 1.59f), 0.055f, 0.055f, 0.035f, 16, trim);
-    DrawCylinder(CockpitPoint(state, 1.25f + radioShake, 0.89f, 1.59f), 0.055f, 0.055f, 0.035f, 16, trim);
+    DrawCube(CockpitPoint(state, 0.20f + radioShake, 1.02f, 2.06f), 0.78f, 0.30f, 0.08f, state.car.radioLoose ? Color {88, 47, 36, 255} : panel);
+    DrawCube(CockpitPoint(state, 0.20f + radioShake, 1.05f, 2.11f), 0.48f, 0.075f, 0.045f, state.car.radioOn ? liveTeal : Color {14, 23, 21, 255});
+    DrawSphere(CockpitPoint(state, -0.14f + radioShake, 1.02f, 2.12f), 0.052f, trim);
+    DrawSphere(CockpitPoint(state, 0.54f + radioShake, 1.02f, 2.12f), 0.052f, trim);
 
     const float fanSpin = state.car.fan == FanState::Stopped ? 0.0f : (state.car.fan == FanState::Slow ? 0.35f : (state.car.fan == FanState::Irregular ? 0.66f + std::sin(state.elapsed * 13.0f) * 0.25f : 1.0f));
-    DrawCylinder(CockpitPoint(state, 1.62f, 1.05f, 1.54f), 0.22f, 0.22f, 0.05f, 24, Color {37, 41, 41, 255});
+    DrawCylinder(CockpitPoint(state, 0.64f, 1.06f, 2.08f), 0.17f, 0.17f, 0.05f, 24, Color {37, 41, 41, 255});
     for (int i = 0; i < 4; ++i) {
         const float angle = state.elapsed * 9.0f * fanSpin + static_cast<float>(i) * 1.5707963f;
-        DrawCube(CockpitPoint(state, 1.62f + std::cos(angle) * 0.11f, 1.05f + std::sin(angle) * 0.11f, 1.60f), 0.22f, 0.035f, 0.03f, Color {116, 119, 112, 255});
+        DrawCube(CockpitPoint(state, 0.64f + std::cos(angle) * 0.08f, 1.06f + std::sin(angle) * 0.08f, 2.14f), 0.16f, 0.03f, 0.03f, Color {116, 119, 112, 255});
     }
-    DrawCube(CockpitPoint(state, 1.64f, 0.68f, 1.54f), 1.0f, 0.34f, 0.08f, Color {24, 27, 25, 255});
-    DrawCube(CockpitPoint(state, 1.64f, 0.7f, 1.60f), 0.82f, 0.035f, 0.03f, Color {83, 76, 61, 255});
+    DrawCube(CockpitPoint(state, 0.74f, 0.72f, 2.12f), 0.64f, 0.24f, 0.07f, panel);
+    DrawCube(CockpitPoint(state, 0.74f, 0.75f, 2.17f), 0.50f, 0.03f, 0.025f, Color {83, 76, 61, 255});
 
-    DrawCube(CockpitPoint(state, -2.35f, 0.7f, 1.05f), 0.22f, 0.55f, 1.5f, Color {24, 24, 22, 255});
-    DrawCube(CockpitPoint(state, -2.32f, 1.08f, 1.18f), 0.12f, 0.12f, 0.12f, state.car.doorLock == DoorLockState::Locked ? Amber() : Color {70, 70, 66, 255});
-    DrawCube(CockpitPoint(state, -2.26f, 0.72f, 1.14f), state.car.doorHandleBroken ? 0.08f : 0.48f, 0.08f, 0.14f, state.car.doorHandleBroken ? Color {112, 63, 52, 255} : Color {116, 104, 83, 255});
-    DrawCylinder(CockpitPoint(state, -2.46f, 0.91f, 1.20f), 0.12f, 0.12f, 0.04f, 20, Color {72, 68, 58, 255});
-    DrawSphere(CockpitPoint(state, -2.46f, 0.79f, 1.22f), 0.045f, trim);
-    DrawModelIfReady(assets_->debrisDoor, Vector3 {x - 1.8f, 0.15f, 1.35f}, Vector3 {0, 1, 0}, 35.0f, Vector3 {0.55f, 0.55f, 0.55f}, Color {55, 56, 58, 255});
+    DrawCube(CockpitPoint(state, -0.66f, 0.92f, 2.12f), 0.14f, 0.42f, 0.68f, Color {18, 18, 17, 238});
+    DrawCube(CockpitPoint(state, -0.62f, 1.16f, 2.04f), 0.10f, 0.10f, 0.10f, state.car.doorLock == DoorLockState::Locked ? Amber() : Color {70, 70, 66, 255});
+    DrawCube(CockpitPoint(state, -0.66f, 0.92f, 2.08f), state.car.doorHandleBroken ? 0.08f : 0.32f, 0.07f, 0.12f, state.car.doorHandleBroken ? Color {112, 63, 52, 255} : Color {116, 104, 83, 255});
+    DrawCylinder(CockpitPoint(state, -0.82f, 1.00f, 2.20f), 0.09f, 0.09f, 0.04f, 20, Color {72, 68, 58, 255});
+    DrawSphere(CockpitPoint(state, -0.82f, 0.91f, 2.22f), 0.038f, trim);
 
-    DrawCube(CockpitPoint(state, 0.0f, 1.82f, 1.02f), 1.05f, 0.2f, 0.05f, Color {10, 11, 11, 255});
+    DrawCube(CockpitPoint(state, 0.0f, 1.76f, 1.88f), 0.96f, 0.18f, 0.05f, softBlack);
     if (state.creature.mirrorVisible) {
-        DrawSphere(CockpitPoint(state, -0.16f, 1.82f, 0.95f), 0.035f, PaleEye());
-        DrawSphere(CockpitPoint(state, 0.16f, 1.82f, 0.95f), 0.035f, PaleEye());
+        DrawSphere(CockpitPoint(state, -0.14f, 1.76f, 1.83f), 0.035f, PaleEye());
+        DrawSphere(CockpitPoint(state, 0.14f, 1.76f, 1.83f), 0.035f, PaleEye());
     }
 
-    DrawCube(CockpitPoint(state, 0.0f, 2.3f, 0.6f), 0.72f, 0.08f, 0.2f, state.car.domeLightOn ? Color {214, 190, 130, 255} : Color {29, 30, 27, 255});
+    DrawCube(CockpitPoint(state, 0.0f, 2.06f, 2.35f), 0.64f, 0.07f, 0.18f, state.car.domeLightOn ? Color {214, 190, 130, 255} : Color {29, 30, 27, 255});
 
     const float slip = state.car.shifterSlipTimer > 0.0f ? std::sin(state.elapsed * 18.0f) * 0.16f : 0.0f;
-    DrawCube(CockpitPoint(state, 0.42f, 0.20f, 2.02f), 0.64f, 0.16f, 0.42f, Color {21, 22, 20, 255});
-    DrawCylinderEx(CockpitPoint(state, 0.42f + slip, 0.22f, 2.00f), CockpitPoint(state, 0.42f + slip * 1.4f, 0.68f, 1.86f), 0.045f, 0.035f, 12, Color {92, 87, 75, 255});
-    DrawSphere(CockpitPoint(state, 0.42f + slip * 1.5f, 0.72f, 1.84f), 0.13f, state.car.shifterSlipping ? Color {179, 63, 48, 255} : trim);
+    DrawCube(CockpitPoint(state, 0.28f, 0.22f, 2.72f), 0.52f, 0.13f, 0.34f, Color {19, 20, 19, 255});
+    DrawCylinderEx(CockpitPoint(state, 0.28f + slip, 0.27f, 2.68f), CockpitPoint(state, 0.28f + slip * 1.35f, 0.60f, 2.56f), 0.038f, 0.032f, 12, Color {92, 87, 75, 255});
+    DrawSphere(CockpitPoint(state, 0.28f + slip * 1.5f, 0.64f, 2.53f), 0.085f, state.car.shifterSlipping ? Color {179, 63, 48, 255} : trim);
+
+    rlEnableDepthTest();
 }
 
 void Renderer::DrawHud(const GameState& state, const std::vector<HudMessage>& messages) {

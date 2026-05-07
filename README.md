@@ -68,6 +68,7 @@ Core rule: when a monster is active, slowing below 12 MPH fills the SLOW RISK me
 
 V3 adds the cockpit and skill gameplay pass:
 
+- The first-person cabin now uses the supplied Toyota RAV4 FBX converted to `assets/models/toyota_rav4_cockpit.glb`; the gameplay radio, shifter, ignition, lock, and other diegetic controls are mounted into that cabin.
 - The old right-side gameplay button bar has been replaced with modeled cockpit controls and projected hit areas.
 - Loose radio interference can pull the steering. Click the physical radio to stabilize it before the car drifts off the road.
 - Shifter slip can dump the car into neutral or block acceleration. Click the shifter to re-seat it.
@@ -99,7 +100,7 @@ The project has its own C++ engine layer over raylib:
 - `src/game`: simulation, systems, event director, player interactions
 - `assets`: runtime models, textures, and audio with source zips retained
 
-The renderer uses online CC0 GLB models where useful, plus procedural cockpit, road, fog, creature, and HUD drawing.
+The renderer uses online CC0 GLB models where useful, the supplied Toyota RAV4 cockpit baseline, and procedural road, fog, creature, cockpit-control, and HUD drawing.
 
 ## Verification Commands
 
@@ -111,6 +112,7 @@ build\bin\LinearDrive.exe --capture dist\town_capture.png
 build\bin\LinearDrive.exe --capture dist\menu_v2_capture.png
 build\bin\LinearDrive.exe --capture dist\jumpscare_capture.png
 build\bin\LinearDrive.exe --capture dist\tutorial_capture.png
+build\bin\LinearDrive.exe --capture dist\toyota_cockpit_capture.png
 build\bin\LinearDrive.exe --capture dist\cockpit_controls_capture.png
 build\bin\LinearDrive.exe --capture dist\settings_menu_capture.png
 build\bin\LinearDrive.exe --capture dist\radio_interference_capture.png

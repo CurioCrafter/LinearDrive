@@ -33,6 +33,7 @@ int RunSmokeTests() {
         "models/creature_stalker.glb",
         "models/quaternius_skeleton_tri.obj",
         "models/sedan.glb",
+        "models/toyota_rav4_cockpit.glb",
         "audio/radio_static.mp3",
         "audio/glitch_003.wav",
         "audio/jumpscare.wav",
@@ -217,7 +218,8 @@ int RunCapture(const char* outputPath) {
     const bool treeCrashScene = requestedName.find("treecrash") != std::string::npos;
     const bool stormScene = requestedName.find("storm") != std::string::npos;
     const bool townScene = requestedName.find("town") != std::string::npos;
-    const bool cockpitScene = requestedName.find("cockpit_controls") != std::string::npos;
+    const bool toyotaCockpitScene = requestedName.find("toyota_cockpit") != std::string::npos;
+    const bool cockpitScene = requestedName.find("cockpit_controls") != std::string::npos || toyotaCockpitScene;
     const bool settingsScene = requestedName.find("settings_menu") != std::string::npos;
     const bool radioInterferenceScene = requestedName.find("radio_interference") != std::string::npos;
     const bool shifterSlipScene = requestedName.find("shifter_slip") != std::string::npos;
@@ -236,7 +238,9 @@ int RunCapture(const char* outputPath) {
         state.car.shifterSlipping = true;
         state.car.doorLock = DoorLockState::FakeLocked;
         state.car.falseLockState = true;
-        state.story.warning = "The cockpit is alive. Stabilize the right control.";
+        state.story.warning = toyotaCockpitScene
+            ? "Toyota RAV4 cockpit baseline: controls are mounted inside the cabin."
+            : "The cockpit is alive. Stabilize the right control.";
         state.story.messageTimer = 5.0f;
     } else if (creatureScene) {
         GameState& state = simulation.State();
@@ -374,7 +378,9 @@ int RunCapture(const char* outputPath) {
             state.car.shifterSlipping = true;
             state.car.doorLock = DoorLockState::FakeLocked;
             state.car.falseLockState = true;
-            state.story.warning = "Click the physical cockpit controls to counter faults.";
+            state.story.warning = toyotaCockpitScene
+                ? "Toyota RAV4 cockpit baseline: controls are mounted inside the cabin."
+                : "Click the physical cockpit controls to counter faults.";
             state.story.messageTimer = 5.0f;
         } else if (jumpscareScene) {
             GameState& state = simulation.State();
