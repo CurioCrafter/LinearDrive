@@ -1,0 +1,10 @@
+build/
+dist/
+*.zip
+*.obj
+*.log
+linear_drive_capture.png
+.vs/
+.vscode/
+*.user
+*.suo

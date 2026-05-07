@@ -1,0 +1,9 @@
+newmtl skin
+Kd 0.62 0.68 0.60
+Ka 0.04 0.05 0.04
+newmtl dark
+Kd 0.08 0.10 0.08
+Ka 0.01 0.01 0.01
+newmtl bone
+Kd 0.82 0.80 0.70
+Ka 0.05 0.05 0.04
